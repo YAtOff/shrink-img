@@ -1,0 +1,15 @@
+[package]
+name = "shrink-img"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "shrink_img"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = "0.19.0"
+resize = "0.8.4"
+png = "0.17.7"
+rgb = { version = "0.8.36", default-features = false }
