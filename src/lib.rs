@@ -21,11 +21,20 @@ fn shrink_image_buffer(py: Python, src_image_buffer: &[u8], max_width: u32, max_
 
     let mut dst_image_buffer = Cursor::new(Vec::new());
     dst_image.write_to(&mut dst_image_buffer, format).map_err(image_error_to_py_error)?;
-    Ok( PyBytes::new(py, &dst_image_buffer.get_ref()).into())
+    Ok(PyBytes::new(py, &dst_image_buffer.get_ref()).into())
+}
+
+#[pyfunction]
+fn guess_image_format(src_image_buffer: &[u8]) -> PyResult<&'static str> {
+    let reader = Reader::new(Cursor::new(src_image_buffer))
+        .with_guessed_format()?;
+    let format = reader.format().ok_or(Error::new(ErrorKind::Other, "Unknown image format"))?;
+    Ok(format.to_mime_type())
 }
 
 #[pymodule]
 fn shrink_img(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(shrink_image_buffer, m)?)?;
+    m.add_function(wrap_pyfunction!(guess_image_format, m)?)?;
     Ok(())
 }
