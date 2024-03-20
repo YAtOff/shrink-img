@@ -14,8 +14,9 @@ fn image_error_to_py_error(image_error: ImageError) -> PyErr {
 
 #[pyfunction]
 fn resize_image_buffer(py: Python, src_image_buffer: &[u8], width: u32, height: u32) -> PyResult<PyObject> {
-    let reader = Reader::new(Cursor::new(src_image_buffer))
+    let mut reader = Reader::new(Cursor::new(src_image_buffer))
         .with_guessed_format()?;
+    reader.no_limits();
     let format = reader.format().ok_or(Error::new(ErrorKind::Other, "Unknown image format"))?;
 
     let src_image = reader.decode().map_err(image_error_to_py_error)?;
